@@ -9,14 +9,14 @@
 using namespace std;
 
 // Define constants
-#define SIZE 55
+#define SIZE 55 //Update the size of the maze here
 #define WALL 1
 #define PATH 0
 
 // Maze Class
 class Maze {
   public:
-  	// Define required variables for the maze
+    // Define required variables for the maze
     int startX;
     int startY;
     int maze[SIZE][SIZE];
