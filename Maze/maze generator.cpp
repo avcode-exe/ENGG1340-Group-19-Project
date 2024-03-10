@@ -1,4 +1,8 @@
-// Import required libraries
+/**
+ * @file maze generator.cpp
+ * @brief This file contains the implementation of a maze generator using recursive randomized Prim's Algorithm.
+ */
+
 #include <iostream>
 #include <vector>
 #include <random>
@@ -8,23 +12,25 @@
 
 using namespace std;
 
-// Define constants
-#define SIZE 55 //Update the size of the maze here
+#define SIZE 55 // Update the size of the maze here
 #define WALL 1
 #define PATH 0
 
-// Maze Class
+/**
+ * @class Maze
+ * @brief Represents a maze and provides methods for generating and printing the maze.
+ */
 class Maze {
   public:
-    // Define required variables for the maze
-    int startX;
-    int startY;
-    int maze[SIZE][SIZE];
-    vector<vector<int>> directions = { {0, -2}, {2, 0}, {0, 2}, {-2, 0} };
-    vector<vector<int>> potentialFrontier;
+    int startX; /**< The x-coordinate of the starting point of the maze */
+    int startY; /**< The y-coordinate of the starting point of the maze */
+    int maze[SIZE][SIZE]; /**< The maze grid */
+    vector<vector<int>> directions = { {0, -2}, {2, 0}, {0, 2}, {-2, 0} }; /**< The possible directions to move in the maze */
+    vector<vector<int>> potentialFrontier; /**< The list of potential frontier cells */
 
-		// Maze constructor
-		// Initialized all cells in a maze to be wall
+    /**
+     * @brief Constructs a Maze object and initializes all cells in the maze to be walls.
+     */
     Maze() : startX(1), startY(1){
       for (int y = 0; y < SIZE; y++) {
         for (int x = 0; x < SIZE; x++) {
@@ -33,7 +39,12 @@ class Maze {
       }
     }
 
-		// Assistive functions for generateMaze()
+    /**
+     * @brief Checks if a cell is a duplicate in the list of potential frontiers.
+     * @param x The x-coordinate of the cell
+     * @param y The y-coordinate of the cell
+     * @return True if the cell is not a duplicate, false otherwise
+     */
     bool checkduplicate(int x, int y) {
       for (const auto& vec : potentialFrontier) {
         if (vec[2] == x && vec[3] == y) {
@@ -43,16 +54,18 @@ class Maze {
       return true;
     }
 
-		// Using recursive randomized Prim's Algorithm for generating mazes
-		// Prim's Algorithm is as follows
-		//  1. Initialize the maze with walls (did in the constructor for Maze class)
-		//  2. Randomly select a cell to be the path and starting point of the algorithm
-		//  3. Find all possible frontiers (vertical and horizontal adjacent cells of the path) which has the chance of being the path
-		//  4. Randomly select one of the frontiers and make it a path and the middle cell to be a path
-		//  5. The remove the selected cell from the list of possible frontiers
-		//  6. Repeat step 3 to 5 until the list of possible frontiers is empty
-		// Reference link: https://en.wikipedia.org/wiki/Maze_generation_algorithm#Iterative_randomized_Prim's_algorithm_(without_stack,_without_sets)
-
+    /**
+     * @brief Generates the maze using recursive randomized Prim's Algorithm.
+     * @param x The x-coordinate of the current cell
+     * @param y The y-coordinate of the current cell
+     * @brief Steps:
+     * 1. Select (x, y) to be the starting point
+     * 2. Find all possible frontiers
+     * 3. Randomly select a frontier
+     * 4. Carve a path to the frontier
+     * 5. Repeat steps 2-4 until there are no more frontiers
+     * More info at https://en.wikipedia.org/wiki/Maze_generation_algorithm#Iterative_randomized_Prim's_algorithm_(without_stack,_without_sets)
+     */
     void generateMaze(int x, int y) {
       // Selected (x, y) to be the starting point (step 1)
       maze[x][y] = PATH;
@@ -70,7 +83,7 @@ class Maze {
       sort(potentialFrontier.begin(), potentialFrontier.end());
       potentialFrontier.erase(unique(potentialFrontier.begin(), potentialFrontier.end()), potentialFrontier.end());
 
-			// Step 3 to 6
+      // Step 3 to 6
       while (!potentialFrontier.empty()) {
         int randomIndex = rand() % potentialFrontier.size();
         vector<int> randomFrontier = potentialFrontier[randomIndex];
@@ -87,7 +100,9 @@ class Maze {
       }
     }
 
-    // Print the Maze
+    /**
+     * @brief Prints the maze.
+     */
     void printMaze() {
       for (int y = 0; y < SIZE; y++) {
         for (int x = 0; x < SIZE; x++) {
@@ -103,7 +118,9 @@ class Maze {
       }
     }
 
-		// Save the maze (Current the wall is "#", still under construction for better maze appearance)
+    /**
+     * @brief Saves the maze to a file.
+     */
     void saveMaze() {
       ofstream file("maze.txt");
       if (file.is_open()) {
@@ -127,7 +144,7 @@ class Maze {
 };
 
 int main() {
-	// Initialize random number generator
+  // Initialize random number generator
   srand((unsigned) time(NULL));
 
   // Create a Maze class
@@ -139,7 +156,7 @@ int main() {
   cout << "Maze generated!" << endl;
 
   // Print maze
-//maze.printMaze();
+  // maze.printMaze();
 
   // Save maze
   maze.saveMaze();
