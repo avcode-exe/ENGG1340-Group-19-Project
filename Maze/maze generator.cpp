@@ -139,7 +139,7 @@ int main() {
   cout << "Maze generated!" << endl;
 
   // Print maze
-  maze.printMaze();
+//maze.printMaze();
 
   // Save maze
   maze.saveMaze();
