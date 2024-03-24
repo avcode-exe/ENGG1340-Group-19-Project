@@ -56,6 +56,13 @@ while (usrInput != 'x')
 {   
     move(0,0); //Ensure cursor is at the top-left corner
     getmaxyx(stdscr, screenSizeY, screenSizeX);
+    if (screenSizeX < 56) {
+	clear();
+	printw("Screen width of 56 required\n");
+	printw("Current width: %d\n", screenSizeX);
+	refresh();
+	continue;
+    }
     int i = 0;
     switch (usrInput)
     {
