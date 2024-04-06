@@ -1,13 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <list>
 
 using namespace std;
 
 struct Cell {
     int row;
     int col;
+    Cell* next;
 };
 
 /**
@@ -21,13 +21,13 @@ struct Cell {
  * @param goalCol The column position of the goal in the maze.
  * @return True if a path from the starting position to the goal position is found, false otherwise.
  */
-bool dfs(vector<vector<char>>& maze, int row, int col, list<Cell>& path, int goalRow, int goalCol) {
+bool dfs(vector<vector<char>>& maze, int row, int col, Cell*& path, int goalRow, int goalCol) {
     if (row < 0 || row >= maze.size() || col < 0 || col >= maze[0].size() || maze[row][col] == '#') {
         return false;
     }
 
     if (row == goalRow && col == goalCol) {
-        path.push_back({row, col});
+        path = new Cell{row, col, path};
         return true;
     }
 
@@ -35,7 +35,7 @@ bool dfs(vector<vector<char>>& maze, int row, int col, list<Cell>& path, int goa
 
     if (dfs(maze, row - 1, col, path, goalRow, goalCol) || dfs(maze, row + 1, col, path, goalRow, goalCol) ||
         dfs(maze, row, col - 1, path, goalRow, goalCol) || dfs(maze, row, col + 1, path, goalRow, goalCol)) {
-        path.push_back({row, col});
+        path = new Cell{row, col, path};
         return true;
     }
 
@@ -65,7 +65,7 @@ int main() {
     int goalRow = maze.size() - 1;
     int goalCol = maze[0].size() - 2;
 
-    list<Cell> path;
+    Cell* path = nullptr;
     vector<vector<char>> mazeCopy = maze;
     bool foundPath = dfs(mazeCopy, startRow, startCol, path, goalRow, goalCol);
 
@@ -78,7 +78,7 @@ int main() {
     for (int i = 0; i < maze.size(); i++) {
         for (int j = 0; j < maze[i].size(); j++) {
             bool found = false;
-            for (auto it = path.rbegin(); it != path.rend(); ++it) {
+            for (Cell* it = path; it != nullptr; it = it->next) {
                 if (i == it->row && j == it->col) {
                     cout << '~' << ' ';
                     found = true;
@@ -90,6 +90,12 @@ int main() {
             }
         }
         cout << endl;
+    }
+
+    while (path != nullptr) {
+        Cell* next = path->next;
+        delete path;
+        path = next;
     }
 
     return 0;
