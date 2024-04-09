@@ -96,7 +96,6 @@ while (usrInput != 'x')
         break;
     usrInput = getch();
 }
-getch();
 endwin();
 }
 void displayMap(vector <string>& mazemap,int screenSizeX, int screenSizeY, int linepointer, int colpointer, int playerPosY, int playerPosX)
