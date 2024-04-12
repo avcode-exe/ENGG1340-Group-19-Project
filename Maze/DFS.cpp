@@ -1,14 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-
-using namespace std;
-
-struct Cell {
-    int row;
-    int col;
-    Cell* next;
-};
+#include "DFS.h"
 
 /**
  * Performs a depth-first search (DFS) on a maze to find a path from a given starting position to a goal position.
@@ -43,15 +33,34 @@ bool dfs(vector<vector<char>>& maze, int row, int col, Cell*& path, int goalRow,
 }
 
 /**
+ * @brief Deletes a linked list of Cells representing a path in the maze.
+ *
+ * This function iterates over a linked list of Cells, deleting each Cell as it goes.
+ * It uses a while loop to traverse the list. Inside the loop, it saves the pointer to the next Cell,
+ * deletes the current Cell, and then moves the path pointer to the next Cell.
+ * The loop continues until it has deleted all Cells, i.e., until the path pointer is nullptr.
+ *
+ * @param path A pointer to the first Cell in the linked list representing the path.
+ */
+void deletePath(Cell* path) {
+    while (path != nullptr) {
+        Cell* next = path->next;
+        delete path;
+        path = next;
+    }
+}
+
+/**
  * @brief The main function reads a maze from a file, performs a depth-first search (DFS) to find a path from the start to the goal, and prints the maze with the path marked.
  * 
  * @return int Returns 0 if the program executed successfully.
  */
-int main() {
+Cell* findPath() {
     ifstream file("maze.txt");
     if (!file) {
+        Cell* temp = nullptr;
         cout << "Failed to open the maze file." << endl;
-        return 1;
+        return temp;
     }
 
     vector<vector<char>> maze;
@@ -67,36 +76,7 @@ int main() {
 
     Cell* path = nullptr;
     vector<vector<char>> mazeCopy = maze;
-    bool foundPath = dfs(mazeCopy, startRow, startCol, path, goalRow, goalCol);
+    dfs(mazeCopy, startRow, startCol, path, goalRow, goalCol);
 
-    if (foundPath) {
-        cout << "Path found:" << endl;
-    } else {
-        cout << "No path found." << endl;
-    }
-
-    for (int i = 0; i < maze.size(); i++) {
-        for (int j = 0; j < maze[i].size(); j++) {
-            bool found = false;
-            for (Cell* it = path; it != nullptr; it = it->next) {
-                if (i == it->row && j == it->col) {
-                    cout << '~' << ' ';
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                cout << (maze[i][j] == '#' ? "▓▓" : "  ");
-            }
-        }
-        cout << endl;
-    }
-
-    while (path != nullptr) {
-        Cell* next = path->next;
-        delete path;
-        path = next;
-    }
-
-    return 0;
+    return path;
 }
