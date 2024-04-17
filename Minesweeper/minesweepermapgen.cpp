@@ -1,11 +1,9 @@
+#include "ms_config.h"
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <ctime>
-#define SIZE 15
 using namespace std;
-
-const int size=15;
-const int mines=20;
 
 void minefieldgen(int size, int mines, char cord[][SIZE]);
 int randcord(int size);
@@ -15,8 +13,8 @@ int countmine(int x, int y, char cord[][SIZE]);
 int main() {
 	srand(time(NULL));
 	char cord[SIZE][SIZE];
-	
-	minefieldgen(size, mines, cord);
+
+	minefieldgen(SIZE, MINES, cord);
 }
 
 int randcord(int size) {
@@ -65,7 +63,7 @@ void minefieldgen(int size, int mines, char cord[][SIZE]) {
 		}
 	}
 	
-	for (int m=0; m<mines+1; m++) {
+	for (int m=0; m<mines; m++) {
 		int x = randcord(SIZE);
 		int y = randcord(SIZE);
 
@@ -86,14 +84,21 @@ void minefieldgen(int size, int mines, char cord[][SIZE]) {
 		}
 	}
 
-
+	ofstream fout;
+	noskipws(fout);
+	fout.open("minefield.txt");
+	if (fout.fail()) {
+		cout << "error opening minefield.txt" << endl;
+		exit(1);
+	};
 
 	for (int i=0; i<size; i++) {
 		for (int j=0; j<size; j++) {
-			cout << cord[i][j];
+			fout << cord[i][j];
 		}
-		cout << endl;
-	}
+		fout << endl;
+	};
 
+	fout.close();
 
 }
