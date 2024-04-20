@@ -1,14 +1,16 @@
-TARGET = mazeGameFinal.o
+TARGET = mazeGame
 CPPFILES = mazegenfinal.cpp mazegamefinal.cpp DFS.cpp
 HEADERFILES = mazeGame.h DFS.h
+CPPFLAGS = -pedantic-errors -Werror -std=c++11
 
+all: mazeGame
 $(TARGET): $(CPPFILES) $(HEADERFILES)
-	g++ $^ -o $@ -lncurses
+	g++ $(CPPFLAGS) $^ -o $@ -lncurses
 
 run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f *.o
+	rm -f mazeGame
 
 .PHONY: run clean
