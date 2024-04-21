@@ -1,22 +1,14 @@
-#TARGET_MAZE: mazeGameFinal
-#TARGET_MS: minesweeper
-MAZE_PATH = ./Maze/
-MS_PATH = ./Minesweeper/
+TARGET = mazeGameFinal
+CPPFILES = Maze/mazegenfinal.cpp main.cpp Maze/DFS.cpp Minesweeper/minesweeper.cpp
+HEADERFILES = Maze/mazeGame.h Maze/DFS.h Minesweeper/minewseeper.h Minesweeper/colors.h Minesweeper/ms_config.h
 
-all: minesweeper maze
+$(TARGET): $(CPPFILES) $(HEADERFILES)
+	g++ $^ -o $@ -lncurses
 
-minesweeper: $(MS_PATH)Makefile
-	cd $(MS_PATH) && $(MAKE)
-maze: $(MAZE_PATH)Makefile
-	cd $(MAZE_PATH) && $(MAKE)
+run: $(TARGET)
+	./$(TARGET)
 
+clean:
+	rm -f $(TARGET)
 
-clean: clean_ms clean_maze
-
-clean_ms: $(MS_PATH)Makefile
-	cd $(MS_PATH) && $(MAKE) clean
-
-clean_maze: $(MAZE_PATH)Makefile
-	cd $(MAZE_PATH) && $(MAKE) clean
-
-.PHONY: minesweeper maze clean
+.PHONY: run clean
