@@ -1,4 +1,3 @@
-#include "colors.h"
 #include "ms_config.h"
 
 #include <algorithm>
@@ -6,10 +5,10 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <ncurses.h>
 #include <sstream>
 #include <string>
-
-#include <ncurses.h>
+#include <vector>
 
 using namespace std;
 // Load
@@ -35,18 +34,6 @@ void loadMinefield(char cord[][SIZE]) {
 
   fin.close();
 }
-
-void printMinefield(char cord[][SIZE]) {
-  for (int i = 0; i < SIZE; i++) {
-    for (int j = 0; j < SIZE; j++) {
-      setColor(cord[i][j]);
-      cout << cord[i][j] << " ";
-      resetColor();
-    };
-    cout << endl;
-  };
-}
-
 void display(char cord[][SIZE], int posX, int posY, bool flagMode) {
   clear();
   move(0, 0);
@@ -88,11 +75,36 @@ bool checkIfRevealed(char cord[][SIZE], int row, int col) {
   return true;
 }
 
-void revealPos(char cord[][SIZE], char gameBoard[][SIZE], int row, int col) {
-  // if (std::find(visited.begin(), visited.end(), vector<int>{row, col}) !=
-  //   vistied.end()) {
-  //}
-  gameBoard[row][col] = cord[row][col];
+bool revealPos(char cord[][SIZE], char gameBoard[][SIZE], int row, int col,
+               vector<vector<int>> &visited) {
+  // getch();
+  if (std::find(visited.begin(), visited.end(), vector<int>{row, col}) ==
+      visited.end()) {
+    visited.push_back(vector<int>{row, col});
+    gameBoard[row][col] = cord[row][col];
+    if (cord[row][col] != ' ') {
+      // printw("rejected");
+      return false;
+    }
+    // clear();
+    for (vector<int> spread : vector<vector<int>>{{row - 1, col - 1},
+                                                  {row - 1, col},
+                                                  {row - 1, col + 1},
+                                                  {row, col - 1},
+                                                  {row, col + 1},
+                                                  {row + 1, col - 1},
+                                                  {row + 1, col},
+                                                  {row + 1, col + 1}}) {
+      if (spread[0] >= 0 && spread[0] < SIZE && spread[1] >= 0 &&
+          spread[1] < SIZE) {
+        // printw("\nrecuring %d %d (from %d %d)", spread[0], spread[1], row,
+        // col); refresh();
+        revealPos(cord, gameBoard, spread[0], spread[1], visited);
+      }
+    }
+  }
+  // printw("skipped");
+  return false;
 }
 
 bool checkIfMineFound(char cord[][SIZE], int row, int col) {
@@ -191,7 +203,8 @@ int main() {
         errorMsg = "Tile was already revealed. Please choose another one.";
         continue;
       };
-      revealPos(mf, gameBoard, row_in, col_in);
+      vector<vector<int>> visited{};
+      revealPos(mf, gameBoard, row_in, col_in, visited);
 
       if (checkIfMineFound(mf, row_in, col_in)) {
         gameLose == true;
