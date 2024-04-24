@@ -62,7 +62,7 @@ void display(char cord[][MSIZE], int posX, int posY, bool flagMode,
          flagMode ? "(flag ON)" : "(flag OFF)");
   printw("\n");
   if (message == "")
-    printw("Use spacebar to select tile");
+    printw("Use spacebar to select tile, 'f' to flag");
   else {
     printw("%s", message.c_str());
   }
@@ -161,10 +161,11 @@ int minesweeper() {
   int row_in, col_in;
   bool flagMode;
   bool act;
-  clear();
   while (!checkIfGameWin(gameBoard)) {
     flagMode = false;
     act = false;
+    clear();
+    refresh();
     while (!act) {
       // printMinefield(gameBoard);
       display(gameBoard, posX, posY, flagMode, errorMsg);
