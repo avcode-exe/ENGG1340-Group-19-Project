@@ -115,36 +115,43 @@ int main() {
   bool msPause = false;
   std::thread monsterThread([&]() {
     while (gameRunning) {
-      if (!msPause && moveMonsters(mazemap, monsterPositions, make_pair(playerPosY, playerPosX))) {
+      if (!msPause && moveMonsters(mazemap, monsterPositions,
+                                   make_pair(playerPosY, playerPosX))) {
         msPause = true;
-        
+
         clear();
         refresh();
-        
+
         msR = minesweeper();
-        
+
         if (msR != 0) {
           playerHP--;
         }
         if (playerHP <= 0) {
           refresh();
           clear(); // Clear the screen to display the game over message cleanly
-          getmaxyx(stdscr, screenSizeY, screenSizeX); // Get the current screen size
+          getmaxyx(stdscr, screenSizeY,
+                   screenSizeX); // Get the current screen size
 
-          int startX = (screenSizeX - 10) / 2; // Calculate starting X to center the message
+          int startX = (screenSizeX - 10) /
+                       2; // Calculate starting X to center the message
           int startY = screenSizeY / 2; // Center Y position
 
-          mvprintw(startY, startX, "Game over!"); // Display "Game over!" at the center
-          refresh(); // Refresh the screen to show the message
-          this_thread::sleep_for(std::chrono::seconds(2)); // Pause for 2 seconds
+          mvprintw(startY, startX,
+                   "Game over!"); // Display "Game over!" at the center
+          refresh();              // Refresh the screen to show the message
+          this_thread::sleep_for(
+              std::chrono::seconds(2)); // Pause for 2 seconds
           gameRunning = false;
+          msPause = false;
           break;
         }
-        auto nearestCheckpoint = findNearestCheckpoint(checkpointPositions, playerPosY, playerPosX);
+        auto nearestCheckpoint =
+            findNearestCheckpoint(checkpointPositions, playerPosY, playerPosX);
         playerPosY = nearestCheckpoint.first;
         playerPosX = nearestCheckpoint.second;
         msPause = false;
-        
+
         clear();
         refresh();
       }
@@ -156,7 +163,8 @@ int main() {
   nodelay(stdscr, TRUE);
 
   do {
-    while (msPause) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (msPause)
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     move(0, 0);
     getmaxyx(stdscr, screenSizeY, screenSizeX);
     if (screenSizeX < 56) {
