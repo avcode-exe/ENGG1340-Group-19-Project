@@ -51,8 +51,12 @@ $(TARGET): $(OBJ)
 %.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
+# Run target
+run: $(TARGET)
+	./$(TARGET)
+
 # Clean target
 clean:
 	rm -f $(TARGET) $(OBJ)
 
-.PHONY: all clean
+.PHONY: all clean run
