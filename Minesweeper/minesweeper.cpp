@@ -9,15 +9,14 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
 using namespace std;
 // Load
-void loadMinefield(char cord[][SIZE]) {
+void loadMinefield(char cord[][MSIZE]) {
   string minefield_stream;
 
   ifstream fin;
   noskipws(fin);
-  fin.open("minefield.txt");
+  fin.open("../Minesweeper/minefield.txt");
 
   if (fin.fail()) {
     cout << "error opening minefield.txt" << endl;
@@ -25,8 +24,8 @@ void loadMinefield(char cord[][SIZE]) {
   };
 
   char newline;
-  for (int i = 0; i < SIZE; i++) {
-    for (int j = 0; j < SIZE; j++) {
+  for (int i = 0; i < MSIZE; i++) {
+    for (int j = 0; j < MSIZE; j++) {
       fin >> cord[i][j];
     }
     fin >> newline;
@@ -34,12 +33,11 @@ void loadMinefield(char cord[][SIZE]) {
 
   fin.close();
 }
-void display(char cord[][SIZE], int posX, int posY, bool flagMode,
+void display(char cord[][MSIZE], int posX, int posY, bool flagMode,
              string message) {
-  clear();
   move(0, 0);
-  for (int i = 0; i < SIZE; i++) {
-    for (int j = 0; j < SIZE; j++) {
+  for (int i = 0; i < MSIZE; i++) {
+    for (int j = 0; j < MSIZE; j++) {
       if (cord[i][j] == 'X') {
         attron(COLOR_PAIR(3));
         addch(cord[i][j]);
@@ -71,22 +69,22 @@ void display(char cord[][SIZE], int posX, int posY, bool flagMode,
   refresh();
 }
 
-void initGameBoard(char cord[][SIZE]) {
-  for (int r = 0; r < SIZE; r++) {
-    for (int c = 0; c < SIZE; c++) {
+void initGameBoard(char cord[][MSIZE]) {
+  for (int r = 0; r < MSIZE; r++) {
+    for (int c = 0; c < MSIZE; c++) {
       cord[r][c] = '#';
     }
   }
 }
 
-bool checkIfRevealed(char cord[][SIZE], int row, int col) {
+bool checkIfRevealed(char cord[][MSIZE], int row, int col) {
   if (cord[row][col] == '#' || cord[row][col] == 'F') {
     return false;
   };
   return true;
 }
 
-bool revealPos(char cord[][SIZE], char gameBoard[][SIZE], int row, int col,
+bool revealPos(char cord[][MSIZE], char gameBoard[][MSIZE], int row, int col,
                vector<vector<int>> &visited) {
   // getch();
   if (std::find(visited.begin(), visited.end(), vector<int>{row, col}) ==
@@ -106,8 +104,8 @@ bool revealPos(char cord[][SIZE], char gameBoard[][SIZE], int row, int col,
                                                   {row + 1, col - 1},
                                                   {row + 1, col},
                                                   {row + 1, col + 1}}) {
-      if (spread[0] >= 0 && spread[0] < SIZE && spread[1] >= 0 &&
-          spread[1] < SIZE) {
+      if (spread[0] >= 0 && spread[0] < MSIZE && spread[1] >= 0 &&
+          spread[1] < MSIZE) {
         // printw("\nrecuring %d %d (from %d %d)", spread[0], spread[1], row,
         // col); refresh();
         revealPos(cord, gameBoard, spread[0], spread[1], visited);
@@ -118,14 +116,14 @@ bool revealPos(char cord[][SIZE], char gameBoard[][SIZE], int row, int col,
   return false;
 }
 
-bool checkIfMineFound(char cord[][SIZE], int row, int col) {
+bool checkIfMineFound(char cord[][MSIZE], int row, int col) {
   if (cord[row][col] == 'X') {
     return true;
   };
   return false;
 }
 
-void placeFlag(char cord[][SIZE], int row, int col) {
+void placeFlag(char cord[][MSIZE], int row, int col) {
   if (cord[row][col] == '#') {
     cord[row][col] = 'F';
     return;
@@ -135,10 +133,10 @@ void placeFlag(char cord[][SIZE], int row, int col) {
     return;
   }
 }
-bool checkIfGameWin(char cord[][SIZE]) {
+bool checkIfGameWin(char cord[][MSIZE]) {
   bool gameWin = true;
-  for (int r = 0; r < SIZE; r++) {
-    for (int c = 0; c < SIZE; c++) {
+  for (int r = 0; r < MSIZE; r++) {
+    for (int c = 0; c < MSIZE; c++) {
       if (cord[r][c] == '#') {
         gameWin = false;
       }
@@ -148,23 +146,14 @@ bool checkIfGameWin(char cord[][SIZE]) {
   return gameWin;
 }
 
-int main() {
-  initscr();
-  cbreak();
-  noecho();
-  start_color();
-
-  init_pair(1, COLOR_WHITE, COLOR_BLACK);
-  init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-  init_pair(3, COLOR_WHITE, COLOR_RED);
-  init_pair(4, COLOR_BLACK, COLOR_WHITE);
+int minesweeper() {
   char usrInput{};
   int posX = 0;
   int posY = 0;
-  char mf[SIZE][SIZE];
+  char mf[MSIZE][MSIZE];
   loadMinefield(mf);
 
-  char gameBoard[SIZE][SIZE];
+  char gameBoard[MSIZE][MSIZE];
   initGameBoard(gameBoard);
 
   bool gameLose = false;
@@ -172,8 +161,8 @@ int main() {
   int row_in, col_in;
   bool flagMode;
   bool act;
+  clear();
   while (!checkIfGameWin(gameBoard)) {
-    system("clear");
     flagMode = false;
     act = false;
     while (!act) {
@@ -190,7 +179,7 @@ int main() {
           posY--;
         break;
       case 's':
-        if (posY + 1 < SIZE)
+        if (posY + 1 < MSIZE)
           posY++;
         break;
       case 'a':
@@ -198,7 +187,7 @@ int main() {
           posX--;
         break;
       case 'd':
-        if (posX + 1 < SIZE)
+        if (posX + 1 < MSIZE)
           posX++;
         break;
       case ' ':
@@ -209,6 +198,10 @@ int main() {
       case 'f':
         flagMode = !flagMode;
         break;
+#ifdef DEBUG
+      case 'y':
+        return 0;
+#endif
       }
     }
 #if 0
@@ -229,13 +222,13 @@ int main() {
 
       if (checkIfMineFound(mf, row_in, col_in)) {
         gameLose == true;
-        system("clear");
-        display(gameBoard, posX, posY, flagMode, "GAME OVER!");
-        return 0;
+        display(gameBoard, posX, posY, flagMode, "GAME OVER!\n You Lose!");
+        return -1;
       }
     }
   };
 
-  cout << "GAME CLEARED!" << endl;
+  display(gameBoard, posX, posY, flagMode,
+          "Cleared!\n Press Any button to continue");
   return 0;
 }
