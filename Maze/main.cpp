@@ -6,9 +6,10 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+
 void displayMap(const vector<string> &mazemap, int screenSizeY, int linepointer,
                 int playerPosY, int playerPosX,
-                const vector<pair<int, int>> &monsterPositions);
+                const vector<pair<int, int>> &monsterPositions, int playerHP);
 bool moveMonsters(vector<string> &mazemap,
                   vector<pair<int, int>> &monsterPositions,
                   pair<int, int> playerPos);
@@ -52,6 +53,7 @@ int main() {
 
   int playerPosX = 1;
   int playerPosY = 0;
+  int playerHP = 5;
   int screenSizeY;
   int screenSizeX;
   // Normal startup procedue for ncurse libraryT
@@ -111,29 +113,41 @@ int main() {
   }
   int msR;
   bool msPause = false;
-  // Create a separate thread for moving the monsters
   std::thread monsterThread([&]() {
     while (gameRunning) {
-      // Move monsters and check for player collision with a monster
-      if (moveMonsters(mazemap, monsterPositions,
-                       make_pair(playerPosY, playerPosX))) {
+      if (!msPause && moveMonsters(mazemap, monsterPositions, make_pair(playerPosY, playerPosX))) {
         msPause = true;
-        msR = 2;
-        // Minesweeper
+        
         clear();
+        refresh();
+        
         msR = minesweeper();
+        
         if (msR != 0) {
-          gameRunning = false;
+          playerHP--;
         }
-        // If player touches monster, reposition to nearest checkpoint
-        auto nearestCheckpoint =
-            findNearestCheckpoint(checkpointPositions, playerPosY, playerPosX);
+        if (playerHP <= 0) {
+          refresh();
+          clear(); // Clear the screen to display the game over message cleanly
+          getmaxyx(stdscr, screenSizeY, screenSizeX); // Get the current screen size
+
+          int startX = (screenSizeX - 10) / 2; // Calculate starting X to center the message
+          int startY = screenSizeY / 2; // Center Y position
+
+          mvprintw(startY, startX, "Game over!"); // Display "Game over!" at the center
+          refresh(); // Refresh the screen to show the message
+          this_thread::sleep_for(std::chrono::seconds(2)); // Pause for 2 seconds
+          gameRunning = false;
+          break;
+        }
+        auto nearestCheckpoint = findNearestCheckpoint(checkpointPositions, playerPosY, playerPosX);
         playerPosY = nearestCheckpoint.first;
         playerPosX = nearestCheckpoint.second;
         msPause = false;
+        
+        clear();
+        refresh();
       }
-
-      // Wait for 1 second
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
   });
@@ -142,11 +156,8 @@ int main() {
   nodelay(stdscr, TRUE);
 
   do {
-    if (msPause == true) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
-      continue;
-    }
-    move(0, 0); // Ensure cursor is at the top-left corner
+    while (msPause) std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    move(0, 0);
     getmaxyx(stdscr, screenSizeY, screenSizeX);
     if (screenSizeX < 56) {
       clear();
@@ -185,7 +196,7 @@ int main() {
     }
     // Display the map with the player and monsters
     displayMap(mazemap, screenSizeY, linepointer, playerPosY, playerPosX,
-               monsterPositions);
+               monsterPositions, playerHP);
     refresh();
     if (playerPosY + 1 >= mazemap.size())
       break;
@@ -193,7 +204,7 @@ int main() {
     if (usrInput == ERR) {
       continue; // No input from the user, continue the loop
     }
-  } while (usrInput != 'x' && usrInput != 'X' && gameRunning == true);
+  } while (usrInput != 'x' && usrInput != 'X' && gameRunning);
   gameRunning = false;
 
   // Make sure to join the thread before exiting the program
@@ -264,7 +275,7 @@ void moveMonster(vector<string> &mazemap, pair<int, int> &monsterPos,
 
 void displayMap(const vector<string> &originalMazemap, int screenSizeY,
                 int linepointer, int playerPosY, int playerPosX,
-                const vector<pair<int, int>> &monsterPositions) {
+                const vector<pair<int, int>> &monsterPositions, int playerHP) {
   vector<string> mazemap =
       originalMazemap; // Create a copy of the original maze
 
@@ -307,6 +318,8 @@ void displayMap(const vector<string> &originalMazemap, int screenSizeY,
     }
     i++;
   }
+  // Display player HP on the right side of the map
+  mvprintw(20, mazemap.size() + 60, "HP: %d", playerHP);
   refresh();
 }
 
