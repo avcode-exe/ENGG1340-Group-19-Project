@@ -1,4 +1,4 @@
-#include "../Minesweeper/minesweeper.cpp"
+#include "minesweeper.h"
 #include "mazeGame.h"
 #include <climits>
 #include <future>
@@ -19,13 +19,22 @@ void moveMonster(vector<string> &mazemap, pair<int, int> &monsterPos,
 unordered_map<int, pair<int, int>> monsterDirections;
 pair<int, int> findNearestCheckpoint(const vector<pair<int, int>> &checkpoints,
                                      int playerPosY, int playerPosX);
+void storeStatus(int playerPosY, int playerPosX, int playerHP, int linepointer);
 
 int main() {
   char newGame;
   bool gameRunning = true;
-  cout << "New game? [y/n]: ";
+  int playerPosX;
+  int playerPosY;
+  int playerHP;
+  int linepointer;
+  cout << "New game? ('n' for resume game) [y/n]: ";
   cin >> newGame;
   if (newGame == 'y') {
+    playerPosX = 1;
+    playerPosY = 0;
+    playerHP = 5;
+    linepointer = 0;
     Maze maze_temp;
     float monsterDensity = 0.5f;
     maze_temp.generateMaze(maze_temp.startX, maze_temp.startY);
@@ -34,6 +43,15 @@ int main() {
     maze_temp.placeMonsters(monsterDensity, path);
     maze_temp.saveMaze();
     deletePath(path);
+  } else {
+    ifstream statusFile("status.txt");
+    if (!statusFile) {
+      cerr << "Error: status.txt not found!" << endl;
+      return 1;
+    }
+    // Ensure to read using the same format (with spaces as separators)
+    statusFile >> playerPosY >> playerPosX >> playerHP >> linepointer;
+    statusFile.close();
   }
   ifstream mazefile{"maze.txt"};
 
@@ -51,9 +69,6 @@ int main() {
     mazemap.push_back(mazeStrip);
   }
 
-  int playerPosX = 1;
-  int playerPosY = 0;
-  int playerHP = 5;
   int screenSizeY;
   int screenSizeX;
   // Normal startup procedue for ncurse libraryT
@@ -69,7 +84,6 @@ int main() {
   init_pair(6, COLOR_CYAN, COLOR_BLACK);
 
   char usrInput{};
-  int linepointer = 0;
 
   vector<pair<int, int>> monsterPositions;
 
@@ -123,6 +137,7 @@ int main() {
         refresh();
 
         msR = minesweeper();
+        std::this_thread::sleep_for(std::chrono::seconds(1)); // Pause for 1 second
 
         if (msR != 0) {
           playerHP--;
@@ -214,6 +229,10 @@ int main() {
     }
   } while (usrInput != 'x' && usrInput != 'X' && gameRunning);
   gameRunning = false;
+
+  if (usrInput == 'x' || usrInput == 'X') {
+    storeStatus(playerPosY, playerPosX, playerHP, linepointer);
+  }
 
   // Make sure to join the thread before exiting the program
   monsterThread.join();
@@ -348,4 +367,14 @@ pair<int, int> findNearestCheckpoint(const vector<pair<int, int>> &checkpoints,
   }
 
   return nearestCheckpoint;
+}
+
+void storeStatus(int playerPosY, int playerPosX, int playerHP, int linepointer) {
+  ofstream statusfile("status.txt");
+  if (statusfile.fail()) {
+    cerr << "Error opening status file" << endl;
+    return;
+  }
+  statusfile << playerPosY << " " << playerPosX << " " << playerHP << " " << linepointer;
+  statusfile.close();
 }

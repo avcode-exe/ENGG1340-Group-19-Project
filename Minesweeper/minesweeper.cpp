@@ -1,4 +1,4 @@
-#include "ms_config.h"
+#include "minewseepergen.h"
 
 #include <algorithm>
 #include <cctype>
@@ -16,7 +16,7 @@ void loadMinefield(char cord[][MSIZE]) {
 
   ifstream fin;
   noskipws(fin);
-  fin.open("../Minesweeper/minefield.txt");
+  fin.open("minefield.txt");
 
   if (fin.fail()) {
     cout << "error opening minefield.txt" << endl;
@@ -147,6 +147,7 @@ bool checkIfGameWin(char cord[][MSIZE]) {
 }
 
 int minesweeper() {
+  minewsweepergenmain();
   char usrInput{};
   int posX = 0;
   int posY = 0;
@@ -230,6 +231,6 @@ int minesweeper() {
   };
 
   display(gameBoard, posX, posY, flagMode,
-          "Cleared!\n Press Any button to continue");
+          "Cleared!");
   return 0;
 }
