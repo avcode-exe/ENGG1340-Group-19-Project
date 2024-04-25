@@ -17,11 +17,12 @@ void minewsweepergenmain() {
 	minefieldgen(MSIZE, MINES, cord);
 }
 
+//Generate a random number for coordinates
 int randcord(int size) {
 	return rand() % size;
 }
 
-
+//Check where the mine is
 bool checkismine(int x, int y,int size, char cord[][MSIZE]) {
 	if (x<0 || x>size-1 || y<0 || y>size-1) 
 		return false;
@@ -31,7 +32,7 @@ bool checkismine(int x, int y,int size, char cord[][MSIZE]) {
 }
 
 
-
+//Count the number of mines 
 int countmine(int x, int y, int size, char cord[][MSIZE]) {
 	int mines =0;
 	
@@ -55,7 +56,7 @@ int countmine(int x, int y, int size, char cord[][MSIZE]) {
 	return mines;
 }
 
-
+//Generate the mine field 
 void minefieldgen(int size, int mines, char cord[][MSIZE]) {
 	for (int i=0; i<size;i++) {
 		for (int j=0; j<size; j++) {
