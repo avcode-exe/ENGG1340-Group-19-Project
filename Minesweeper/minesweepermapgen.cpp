@@ -86,7 +86,7 @@ void minefieldgen(int size, int mines, char cord[][MSIZE]) {
 
 	ofstream fout;
 	noskipws(fout);
-	fout.open("minefield.txt");
+	fout.open(".gameConfig/minefield.txt");
 	if (fout.fail()) {
 		cout << "error opening minefield.txt" << endl;
 		exit(1);

@@ -275,7 +275,7 @@ void Maze::printMaze() {
  * @brief Saves the maze to a file.
  */
 void Maze::saveMaze() {
-    ofstream file("maze.txt");
+    ofstream file(".gameConfig/maze.txt");
     if (file.is_open()) {
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {

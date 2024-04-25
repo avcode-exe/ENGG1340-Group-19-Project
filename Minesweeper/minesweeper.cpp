@@ -16,7 +16,7 @@ void loadMinefield(char cord[][MSIZE]) {
 
   ifstream fin;
   noskipws(fin);
-  fin.open("minefield.txt");
+  fin.open(".gameConfig/minefield.txt");
 
   if (fin.fail()) {
     cout << "error opening minefield.txt" << endl;

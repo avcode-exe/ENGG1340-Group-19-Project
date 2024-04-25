@@ -44,7 +44,7 @@ int main() {
     maze_temp.saveMaze();
     deletePath(path);
   } else {
-    ifstream statusFile("status.txt");
+    ifstream statusFile(".gameConfig/status.txt");
     if (!statusFile) {
       cerr << "Error: status.txt not found!" << endl;
       return 1;
@@ -53,7 +53,7 @@ int main() {
     statusFile >> playerPosY >> playerPosX >> playerHP >> linepointer;
     statusFile.close();
   }
-  ifstream mazefile{"maze.txt"};
+  ifstream mazefile{".gameConfig/maze.txt"};
 
   if (!mazefile) {
     cerr << "Maze map not found!" << endl;
@@ -376,7 +376,7 @@ pair<int, int> findNearestCheckpoint(const vector<pair<int, int>> &checkpoints,
 }
 
 void storeStatus(int playerPosY, int playerPosX, int playerHP, int linepointer) {
-  ofstream statusfile("status.txt");
+  ofstream statusfile(".gameConfig/status.txt");
   if (statusfile.fail()) {
     cerr << "Error opening status file" << endl;
     return;
