@@ -1,20 +1,20 @@
-#include "ms_config.h"
+#include "minewseepergen.h"
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
 using namespace std;
 
-void minefieldgen(int size, int mines, char cord[][SIZE]);
+void minefieldgen(int size, int mines, char cord[][MSIZE]);
 int randcord(int size);
-bool checkismine(int x, int y,int size,char cord[][SIZE]);
-int countmine(int x, int y, char cord[][SIZE]);
+bool checkismine(int x, int y,int size,char cord[][MSIZE]);
+int countmine(int x, int y, char cord[][MSIZE]);
 
-int main() {
+void minewsweepergenmain() {
 	srand(time(NULL));
-	char cord[SIZE][SIZE];
+	char cord[MSIZE][MSIZE];
 
-	minefieldgen(SIZE, MINES, cord);
+	minefieldgen(MSIZE, MINES, cord);
 }
 
 //Generate a random number for coordinates
@@ -23,7 +23,7 @@ int randcord(int size) {
 }
 
 //Check where the mine is
-bool checkismine(int x, int y,int size, char cord[][SIZE]) {
+bool checkismine(int x, int y,int size, char cord[][MSIZE]) {
 	if (x<0 || x>size-1 || y<0 || y>size-1) 
 		return false;
 	if (cord[x][y] == 'X')
@@ -33,7 +33,7 @@ bool checkismine(int x, int y,int size, char cord[][SIZE]) {
 
 
 //Count the number of mines 
-int countmine(int x, int y, int size, char cord[][SIZE]) {
+int countmine(int x, int y, int size, char cord[][MSIZE]) {
 	int mines =0;
 	
 	if (checkismine(x-1,y,size,cord))
@@ -57,7 +57,7 @@ int countmine(int x, int y, int size, char cord[][SIZE]) {
 }
 
 //Generate the mine field 
-void minefieldgen(int size, int mines, char cord[][SIZE]) {
+void minefieldgen(int size, int mines, char cord[][MSIZE]) {
 	for (int i=0; i<size;i++) {
 		for (int j=0; j<size; j++) {
 			cord[i][j] = ' ';
@@ -65,10 +65,10 @@ void minefieldgen(int size, int mines, char cord[][SIZE]) {
 	}
 	
 	for (int m=0; m<mines; m++) {
-		int x = randcord(SIZE);
-		int y = randcord(SIZE);
+		int x = randcord(MSIZE);
+		int y = randcord(MSIZE);
 
-		if (cord[x][y] == ' ') { 
+		if (cord[x][y] == ' ' && x != 0 && y != 0) {
 			cord[x][y] = 'X';
 		}
 		else
@@ -87,7 +87,7 @@ void minefieldgen(int size, int mines, char cord[][SIZE]) {
 
 	ofstream fout;
 	noskipws(fout);
-	fout.open("minefield.txt");
+	fout.open(".gameConfig/minefield.txt");
 	if (fout.fail()) {
 		cout << "error opening minefield.txt" << endl;
 		exit(1);

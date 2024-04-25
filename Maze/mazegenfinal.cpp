@@ -87,8 +87,8 @@ void Maze::generateMaze(int x, int y) {
  * @param cy The y-coordinate of the center of the no monster zone.
  */
 void Maze::markNoMonsterZone(int cx, int cy) {
-    for (int dx = -2; dx <= 2; ++dx) {
-        for (int dy = -2; dy <= 2; ++dy) {
+    for (int dx = -3; dx <= 3; ++dx) {
+        for (int dy = -3; dy <= 3; ++dy) {
             int nx = cx + dx;
             int ny = cy + dy;
             if (nx >= 0 && nx < SIZE && ny >= 0 && ny < SIZE) {
@@ -139,8 +139,8 @@ void Maze::placeMonsters(float density, Cell* path) {
 }
 
 bool Maze::isNearOtherMonster(int x, int y) {
-    for (int dx = -2; dx <= 2; dx++) {
-        for (int dy = -2; dy <= 2; dy++) {
+    for (int dx = -5; dx <= 5; dx++) {
+        for (int dy = -5; dy <= 5; dy++) {
             int nx = x + dx;
             int ny = y + dy;
             if (nx >= 0 && nx < SIZE && ny >= 0 && ny < SIZE && maze[ny][nx] == 'M') {
@@ -275,7 +275,7 @@ void Maze::printMaze() {
  * @brief Saves the maze to a file.
  */
 void Maze::saveMaze() {
-    ofstream file("maze.txt");
+    ofstream file(".gameConfig/maze.txt");
     if (file.is_open()) {
         for (int y = 0; y < SIZE; y++) {
             for (int x = 0; x < SIZE; x++) {
