@@ -67,7 +67,7 @@ void minefieldgen(int size, int mines, char cord[][MSIZE]) {
 		int x = randcord(MSIZE);
 		int y = randcord(MSIZE);
 
-		if (cord[x][y] == ' ') { 
+		if (cord[x][y] == ' ' && x != 0 && y != 0) {
 			cord[x][y] = 'X';
 		}
 		else

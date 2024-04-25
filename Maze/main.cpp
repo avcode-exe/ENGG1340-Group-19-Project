@@ -82,6 +82,8 @@ int main() {
   init_pair(3, COLOR_WHITE, COLOR_RED);
   init_pair(4, COLOR_BLACK, COLOR_WHITE);
   init_pair(6, COLOR_CYAN, COLOR_BLACK);
+  init_pair(7, COLOR_RED, COLOR_BLACK);
+  init_pair(8, COLOR_GREEN, COLOR_BLACK);
 
   char usrInput{};
 
@@ -182,10 +184,12 @@ int main() {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     move(0, 0);
     getmaxyx(stdscr, screenSizeY, screenSizeX);
-    if (screenSizeX < 56) {
+    // Check if the screen size is less than the required size
+    if (screenSizeX < 120) {
       clear();
-      printw("Screen width of 56 required\n");
+      printw("Screen width of 120 required\n");
       printw("Current width: %d\n", screenSizeX);
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
       refresh();
       continue;
     }
@@ -332,7 +336,9 @@ void displayMap(const vector<string> &originalMazemap, int screenSizeY,
         } else if (mazeStrip[j] == '#') {
           printw("##");
         } else if (mazeStrip[j] == 'M') {
+          attron(COLOR_PAIR(8));
           printw("M ");
+          attroff(COLOR_PAIR(8));
         } else if (mazeStrip[j] == 'C') {
           attron(COLOR_PAIR(2));
           printw("C ");
@@ -346,7 +352,7 @@ void displayMap(const vector<string> &originalMazemap, int screenSizeY,
     i++;
   }
   // Display player HP on the right side of the map
-  mvprintw(20, mazemap.size() + 60, "HP: %d", playerHP);
+  mvprintw(screenSizeY / 2, mazemap.size() + 60, "HP: %d", playerHP);
   refresh();
 }
 
