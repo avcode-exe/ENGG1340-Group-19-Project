@@ -7,18 +7,12 @@
 #include <thread>
 #include <unordered_map>
 
-void displayMap(const vector<string> &mazemap, int screenSizeY, int linepointer,
-                int playerPosY, int playerPosX,
-                const vector<pair<int, int>> &monsterPositions, int playerHP);
-bool moveMonsters(vector<string> &mazemap,
-                  vector<pair<int, int>> &monsterPositions,
-                  pair<int, int> playerPos);
+void displayMap(const vector<string> &mazemap, int screenSizeY, int linepointer, int playerPosY, int playerPosX, const vector<pair<int, int>> &monsterPositions, int playerHP);
+bool moveMonsters(vector<string> &mazemap, vector<pair<int, int>> &monsterPositions, pair<int, int> playerPos);
 bool isFree(const vector<string> &mazemap, int y, int x);
-void moveMonster(vector<string> &mazemap, pair<int, int> &monsterPos,
-                 int monsterIndex);
+void moveMonster(vector<string> &mazemap, pair<int, int> &monsterPos, int monsterIndex);
 unordered_map<int, pair<int, int>> monsterDirections;
-pair<int, int> findNearestCheckpoint(const vector<pair<int, int>> &checkpoints,
-                                     int playerPosY, int playerPosX);
+pair<int, int> findNearestCheckpoint(const vector<pair<int, int>> &checkpoints, int playerPosY, int playerPosX);
 void storeStatus(int playerPosY, int playerPosX, int playerHP, int linepointer);
 
 int main() {
@@ -107,9 +101,7 @@ int main() {
     if (mazemap[max(0, y - 1)][x] == '#' ||
         mazemap[min((int)mazemap.size() - 1, y + 1)][x] == '#') {
       // Initial direction is left or right (randomly chosen)
-      monsterDirections[i] = (rand() % 2 == 0)
-                                 ? make_pair(0, -1)
-                                 : make_pair(0, 1); // Left or right
+      monsterDirections[i] = (rand() % 2 == 0) ? make_pair(0, -1) : make_pair(0, 1); // Left or right
     } else {
       // Initial direction is up or down (randomly chosen)
       monsterDirections[i] =
@@ -131,46 +123,46 @@ int main() {
   bool msPause = false;
   std::thread monsterThread([&]() {
     while (gameRunning) {
-      if (!msPause && moveMonsters(mazemap, monsterPositions,
-                                   make_pair(playerPosY, playerPosX))) {
+      if (!msPause && moveMonsters(mazemap, monsterPositions, make_pair(playerPosY, playerPosX))) {
         msPause = true;
 
         clear();
         refresh();
 
         msR = minesweeper();
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // Pause for 1 second
 
         if (msR != 0) {
+          auto nearestCheckpoint = findNearestCheckpoint(checkpointPositions, playerPosY, playerPosX);
+          playerPosY = nearestCheckpoint.first;
+          playerPosX = nearestCheckpoint.second;
           playerHP--;
         }
+        std::this_thread::sleep_for(std::chrono::seconds(1)); // Pause for 1 second
+        
         if (playerHP <= 0) {
           refresh();
           clear(); // Clear the screen to display the game over message cleanly
-          getmaxyx(stdscr, screenSizeY,
-                   screenSizeX); // Get the current screen size
+          getmaxyx(stdscr, screenSizeY, screenSizeX); // Get the current screen size
 
-          int startX = (screenSizeX - 10) /
-                       2; // Calculate starting X to center the message
+          int startX = (screenSizeX - 10) / 2; // Calculate starting X to center the message
           int startY = screenSizeY / 2; // Center Y position
 
-          mvprintw(startY, startX,
-                   "Game over!"); // Display "Game over!" at the center
+          mvprintw(startY, startX, "Game over!"); // Display "Game over!" at the center
           refresh();              // Refresh the screen to show the message
-          this_thread::sleep_for(
-              std::chrono::seconds(2)); // Pause for 2 seconds
+          this_thread::sleep_for(std::chrono::seconds(2)); // Pause for 2 seconds
           gameRunning = false;
           msPause = false;
           break;
         }
-        auto nearestCheckpoint =
-            findNearestCheckpoint(checkpointPositions, playerPosY, playerPosX);
-        playerPosY = nearestCheckpoint.first;
-        playerPosX = nearestCheckpoint.second;
+        
         msPause = false;
 
         clear();
         refresh();
+
+        if (msR == 0) {
+          std::this_thread::sleep_for(std::chrono::seconds(2));
+        }
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
@@ -180,8 +172,9 @@ int main() {
   nodelay(stdscr, TRUE);
 
   do {
-    while (msPause)
+    while (msPause) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     move(0, 0);
     getmaxyx(stdscr, screenSizeY, screenSizeX);
     // Check if the screen size is less than the required size
@@ -194,39 +187,41 @@ int main() {
       continue;
     }
     switch (usrInput) {
-    case 'w':
-      // if 'P' is not already on the upper half of screen (AND it is not at the
-      // beginning)
-      if (playerPosY - linepointer < screenSizeY / 2 && linepointer > 0) {
-        linepointer--; // Move viewpoint up
-      }
-      if (playerPosY > 0 && mazemap[playerPosY - 1][playerPosX] != '#')
-        playerPosY--;
-      break;
-    case 's':
-      // if 'P' is not already on the lower half of screen (AND the last line of
-      // maze is not displayed)
-      if (playerPosY > screenSizeY / 2 + linepointer &&
-          linepointer + screenSizeY < mazemap.size())
-        linepointer++; // Move viewpoint down
-      if (mazemap[playerPosY + 1][playerPosX] != '#')
-        playerPosY++;
-      break;
-    case 'a':
-      if (mazemap[playerPosY][playerPosX - 1] != '#')
-        playerPosX--;
-      break;
-    case 'd':
-      if (mazemap[playerPosY][playerPosX + 1] != '#')
-        playerPosX++;
-      break;
+      case 'w':
+        // if 'P' is not already on the upper half of screen (AND it is not at the beginning)
+        if (playerPosY - linepointer < screenSizeY / 2 && linepointer > 0) {
+          linepointer--; // Move viewpoint up
+        }
+        if (playerPosY > 0 && mazemap[playerPosY - 1][playerPosX] != '#') {
+          playerPosY--;
+        }
+        break;
+      case 's':
+        // if 'P' is not already on the lower half of screen (AND the last line of maze is not displayed)
+        if (playerPosY > screenSizeY / 2 + linepointer && linepointer + screenSizeY < mazemap.size()) {
+          linepointer++; // Move viewpoint down
+        }
+        if (mazemap[playerPosY + 1][playerPosX] != '#') {
+          playerPosY++;
+        }
+        break;
+      case 'a':
+        if (mazemap[playerPosY][playerPosX - 1] != '#') {
+          playerPosX--;
+        }
+        break;
+      case 'd':
+        if (mazemap[playerPosY][playerPosX + 1] != '#') {
+          playerPosX++;
+        }
+        break;
     }
     // Display the map with the player and monsters
-    displayMap(mazemap, screenSizeY, linepointer, playerPosY, playerPosX,
-               monsterPositions, playerHP);
+    displayMap(mazemap, screenSizeY, linepointer, playerPosY, playerPosX, monsterPositions, playerHP);
     refresh();
-    if (playerPosY + 1 >= mazemap.size())
+    if (playerPosY + 1 >= mazemap.size()) {
       break;
+    }
     usrInput = getch();
     if (usrInput == ERR) {
       continue; // No input from the user, continue the loop
@@ -247,13 +242,10 @@ int main() {
 
 // Check if the specified position is free (not a wall or out of bounds)
 bool isFree(const vector<string> &mazemap, int y, int x) {
-  return y >= 0 && y < mazemap.size() && x >= 0 && x < mazemap[0].size() &&
-         mazemap[y][x] != '#' && (y != 0 || x != 1);
+  return y >= 0 && y < mazemap.size() && x >= 0 && x < mazemap[0].size() && mazemap[y][x] != '#' && (y != 0 || x != 1);
 }
 
-bool moveMonsters(vector<string> &mazemap,
-                  vector<pair<int, int>> &monsterPositions,
-                  pair<int, int> playerPos) {
+bool moveMonsters(vector<string> &mazemap, vector<pair<int, int>> &monsterPositions, pair<int, int> playerPos) {
   for (int i = 0; i < monsterPositions.size(); ++i) {
     moveMonster(mazemap, monsterPositions[i], i);
     if (monsterPositions[i] == playerPos) {
@@ -264,8 +256,7 @@ bool moveMonsters(vector<string> &mazemap,
 }
 
 // Change moveMonster to accept an additional parameter: monsterIndex
-void moveMonster(vector<string> &mazemap, pair<int, int> &monsterPos,
-                 int monsterIndex) {
+void moveMonster(vector<string> &mazemap, pair<int, int> &monsterPos, int monsterIndex) {
   pair<int, int> &direction = monsterDirections[monsterIndex];
   pair<int, int> &pos = monsterPos;
 
@@ -304,11 +295,8 @@ void moveMonster(vector<string> &mazemap, pair<int, int> &monsterPos,
   }
 }
 
-void displayMap(const vector<string> &originalMazemap, int screenSizeY,
-                int linepointer, int playerPosY, int playerPosX,
-                const vector<pair<int, int>> &monsterPositions, int playerHP) {
-  vector<string> mazemap =
-      originalMazemap; // Create a copy of the original maze
+void displayMap(const vector<string> &originalMazemap, int screenSizeY, int linepointer, int playerPosY, int playerPosX, const vector<pair<int, int>> &monsterPositions, int playerHP) {
+  vector<string> mazemap = originalMazemap; // Create a copy of the original maze
 
   // Place the player on the map
   if (playerPosY >= linepointer && playerPosY < linepointer + screenSizeY) {
@@ -317,8 +305,7 @@ void displayMap(const vector<string> &originalMazemap, int screenSizeY,
 
   // Place monsters on the map
   for (const auto &monsterPos : monsterPositions) {
-    if (monsterPos.first >= linepointer &&
-        monsterPos.first < linepointer + screenSizeY) {
+    if (monsterPos.first >= linepointer && monsterPos.first < linepointer + screenSizeY) {
       mazemap[monsterPos.first][monsterPos.second] = 'M';
     }
   }
@@ -358,14 +345,12 @@ void displayMap(const vector<string> &originalMazemap, int screenSizeY,
 
 // Assuming the checkpoints vector contains pairs of y and x coordinates
 // and playerPosY and playerPosX are the current player positions
-pair<int, int> findNearestCheckpoint(const vector<pair<int, int>> &checkpoints,
-                                     int playerPosY, int playerPosX) {
+pair<int, int> findNearestCheckpoint(const vector<pair<int, int>> &checkpoints, int playerPosY, int playerPosX) {
   pair<int, int> nearestCheckpoint;
   int minDistance = INT_MAX;
 
   for (const auto &checkpoint : checkpoints) {
-    int distance = abs(checkpoint.first - playerPosY) +
-                   abs(checkpoint.second - playerPosX);
+    int distance = abs(checkpoint.first - playerPosY) + abs(checkpoint.second - playerPosX);
     if (distance < minDistance) {
       minDistance = distance;
       nearestCheckpoint = checkpoint;
