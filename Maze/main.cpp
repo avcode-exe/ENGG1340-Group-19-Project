@@ -140,16 +140,21 @@ int main() {
         refresh();
 
         msR = minesweeper();
-        std::this_thread::sleep_for(
-            std::chrono::seconds(1)); // Pause for 1 second
 
         if (msR != 0) {
+          auto nearestCheckpoint = findNearestCheckpoint(
+              checkpointPositions, playerPosY, playerPosX);
+          playerPosY = nearestCheckpoint.first;
+          playerPosX = nearestCheckpoint.second;
           playerHP--;
           auto nearestCheckpoint = findNearestCheckpoint(
               checkpointPositions, playerPosY, playerPosX);
           playerPosY = nearestCheckpoint.first;
           playerPosX = nearestCheckpoint.second;
         }
+        std::this_thread::sleep_for(
+            std::chrono::seconds(1)); // Pause for 1 second
+
         if (playerHP <= 0) {
           refresh();
           clear(); // Clear the screen to display the game over message cleanly
@@ -174,6 +179,10 @@ int main() {
 
         clear();
         refresh();
+
+        if (msR == 0) {
+          std::this_thread::sleep_for(std::chrono::seconds(2));
+        }
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
@@ -183,8 +192,9 @@ int main() {
   nodelay(stdscr, TRUE);
 
   do {
-    while (msPause)
+    while (msPause) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     move(0, 0);
     getmaxyx(stdscr, screenSizeY, screenSizeX);
     // Check if the screen size is less than the required size
@@ -203,25 +213,30 @@ int main() {
       if (playerPosY - linepointer < screenSizeY / 2 && linepointer > 0) {
         linepointer--; // Move viewpoint up
       }
-      if (playerPosY > 0 && mazemap[playerPosY - 1][playerPosX] != '#')
+      if (playerPosY > 0 && mazemap[playerPosY - 1][playerPosX] != '#') {
         playerPosY--;
+      }
       break;
     case 's':
       // if 'P' is not already on the lower half of screen (AND the last line of
       // maze is not displayed)
       if (playerPosY > screenSizeY / 2 + linepointer &&
-          linepointer + screenSizeY < mazemap.size())
+          linepointer + screenSizeY < mazemap.size()) {
         linepointer++; // Move viewpoint down
-      if (mazemap[playerPosY + 1][playerPosX] != '#')
+      }
+      if (mazemap[playerPosY + 1][playerPosX] != '#') {
         playerPosY++;
+      }
       break;
     case 'a':
-      if (mazemap[playerPosY][playerPosX - 1] != '#')
+      if (mazemap[playerPosY][playerPosX - 1] != '#') {
         playerPosX--;
+      }
       break;
     case 'd':
-      if (mazemap[playerPosY][playerPosX + 1] != '#')
+      if (mazemap[playerPosY][playerPosX + 1] != '#') {
         playerPosX++;
+      }
       break;
     }
     // Display the map with the player and monsters
