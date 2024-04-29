@@ -1,5 +1,5 @@
-#include "minesweeper.h"
 #include "mazeGame.h"
+#include "minesweeper.h"
 #include <climits>
 #include <future>
 #include <ncurses.h>
@@ -24,6 +24,7 @@ void storeStatus(int playerPosY, int playerPosX, int playerHP, int linepointer);
 int main() {
   char newGame;
   bool gameRunning = true;
+  bool win = false;
   int playerPosX;
   int playerPosY;
   int playerHP;
@@ -139,10 +140,15 @@ int main() {
         refresh();
 
         msR = minesweeper();
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // Pause for 1 second
+        std::this_thread::sleep_for(
+            std::chrono::seconds(1)); // Pause for 1 second
 
         if (msR != 0) {
           playerHP--;
+          auto nearestCheckpoint = findNearestCheckpoint(
+              checkpointPositions, playerPosY, playerPosX);
+          playerPosY = nearestCheckpoint.first;
+          playerPosX = nearestCheckpoint.second;
         }
         if (playerHP <= 0) {
           refresh();
@@ -163,10 +169,7 @@ int main() {
           msPause = false;
           break;
         }
-        auto nearestCheckpoint =
-            findNearestCheckpoint(checkpointPositions, playerPosY, playerPosX);
-        playerPosY = nearestCheckpoint.first;
-        playerPosX = nearestCheckpoint.second;
+
         msPause = false;
 
         clear();
@@ -225,15 +228,29 @@ int main() {
     displayMap(mazemap, screenSizeY, linepointer, playerPosY, playerPosX,
                monsterPositions, playerHP);
     refresh();
-    if (playerPosY + 1 >= mazemap.size())
+    if (playerPosY + 1 >= mazemap.size()) {
+      win = true;
       break;
+    }
     usrInput = getch();
     if (usrInput == ERR) {
       continue; // No input from the user, continue the loop
     }
   } while (usrInput != 'x' && usrInput != 'X' && gameRunning);
   gameRunning = false;
+  if (win) {
+    getmaxyx(stdscr, screenSizeY,
+             screenSizeX); // Get the current screen size
+    clear();
+    int startX =
+        (screenSizeX - 10) / 2;   // Calculate starting X to center the message
+    int startY = screenSizeY / 2; // Center Y position
 
+    mvprintw(startY, startX,
+             "You Win!"); // Display "Game over!" at the center
+    refresh();            // Refresh the screen to show the message
+    this_thread::sleep_for(std::chrono::seconds(2)); // Pause for 2 seconds
+  }
   if (usrInput == 'x' || usrInput == 'X') {
     storeStatus(playerPosY, playerPosX, playerHP, linepointer);
   }
@@ -375,12 +392,14 @@ pair<int, int> findNearestCheckpoint(const vector<pair<int, int>> &checkpoints,
   return nearestCheckpoint;
 }
 
-void storeStatus(int playerPosY, int playerPosX, int playerHP, int linepointer) {
+void storeStatus(int playerPosY, int playerPosX, int playerHP,
+                 int linepointer) {
   ofstream statusfile(".gameConfig/status.txt");
   if (statusfile.fail()) {
     cerr << "Error opening status file" << endl;
     return;
   }
-  statusfile << playerPosY << " " << playerPosX << " " << playerHP << " " << linepointer;
+  statusfile << playerPosY << " " << playerPosX << " " << playerHP << " "
+             << linepointer;
   statusfile.close();
 }
