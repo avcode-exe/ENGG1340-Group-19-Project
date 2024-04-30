@@ -147,10 +147,6 @@ int main() {
           playerPosY = nearestCheckpoint.first;
           playerPosX = nearestCheckpoint.second;
           playerHP--;
-          auto nearestCheckpoint = findNearestCheckpoint(
-              checkpointPositions, playerPosY, playerPosX);
-          playerPosY = nearestCheckpoint.first;
-          playerPosX = nearestCheckpoint.second;
         }
         std::this_thread::sleep_for(
             std::chrono::seconds(1)); // Pause for 1 second
