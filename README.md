@@ -54,3 +54,49 @@ git clone https://github.com/avcode-exe/ENGG1340-Group-19-Project.git
 ```
 
 Navigate to the folder. To run the game, simply run `make run` to compile and execute the program.
+
+## Gameplay Tutorial
+
+After running `make run` to start the game, you will be prompted whether a new maze should be generated or not:
+- "y": A new maze will be generated
+- "n": The previous saved maze will be used
+
+You will begin at the starting position of the maze.
+Navigate in the maze using W, A, S, and D keys. The number of health points remaining is shown on the right with "HP". Try to reach the goal position without losing all health points.
+If you get hit by a monster, you will be sent to a game of minesweeper.
+
+In the minesweeper game, you can navigate in the game board using W, A, S, and D keys.
+To reveal a tile, press the spacebar. If a mine, denoted with "X", is revealed, you lose the minesweeper game and will return to the maze with one health point deducted. Otherwise, the minesweeper game continues.
+
+For example, the following shows that a mine is found:
+```
+###
+#X#
+###
+```
+
+If a number is shown instead of a mine, the number represents how many mines are nearby in a 3x3 range with the number at the center of the range.
+
+For example, the following snippet shows that there are 2 mines within this 3x3 range:
+
+```
+###
+#2#
+###
+```
+
+If an empty cell is revealed instead of a number, it indicates that there are no mines near this tile.
+
+For example, the following snippet shows that there are no mines within this 3x3 range:
+
+```
+###
+# #
+###
+```
+
+Apart from revealing tiles, you can also toggle flag mode using the F key. To place a flag on a tile, make sure that flag mode is on, navigate to a tile and press spacebar. The letter "F" will show up on tiles with a flag placed on them.
+
+Keep in mind that you cannot choose tiles that are already revealed. However, you can choose tiles that have a flag placed on them because they have not been revealed yet.
+
+Have fun!
