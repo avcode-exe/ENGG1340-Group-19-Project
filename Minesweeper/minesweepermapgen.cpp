@@ -5,25 +5,56 @@
 #include <ctime>
 using namespace std;
 
+/**
+ * @brief Generate a minesweeper game board
+ * @param size Size of the game board
+ * @param mines Numnber of mines
+ */
 void minefieldgen(int size, int mines, char cord[][MSIZE]);
+
+/**
+ * @brief Generate a random number for coordinates
+ * @param size Size of the game board
+ */
 int randcord(int size);
+
+/**
+ * @brief Check if the selected set of coordinates contains a mine
+ * @param x x-coordinate
+ * @param y y-coordinate
+ * @param size Size of the game board
+ */
 bool checkismine(int x, int y,int size,char cord[][MSIZE]);
+
+/**
+ * @brief Count the number of mines
+ * @param x x-coordinate
+ * @param y y-coordinate
+ */
 int countmine(int x, int y, char cord[][MSIZE]);
 
 void minewsweepergenmain() {
-	srand(time(NULL));
+	srand(time(NULL));		// Initialize rand()
 	char cord[MSIZE][MSIZE];
 
 	minefieldgen(MSIZE, MINES, cord);
 }
 
-//Generate a random number for coordinates
+/**
+ * @brief Generate a random number for coordinates
+ * @param size Size of the game board
+ */
 int randcord(int size) {
 	return rand() % size;
 }
 
-//Check where the mine is
-bool checkismine(int x, int y,int size, char cord[][MSIZE]) {
+/**
+ * @brief Check if the selected set of coordinates contains a mine
+ * @param x x-coordinate
+ * @param y y-coordinate
+ * @param size Size of the game board
+ */
+bool checkismine(int x, int y, int size, char cord[][MSIZE]) {
 	if (x<0 || x>size-1 || y<0 || y>size-1) 
 		return false;
 	if (cord[x][y] == 'X')
@@ -31,8 +62,11 @@ bool checkismine(int x, int y,int size, char cord[][MSIZE]) {
 	return false;
 }
 
-
-//Count the number of mines 
+/**
+ * @brief Count the number of mines
+ * @param x x-coordinate
+ * @param y y-coordinate
+ */
 int countmine(int x, int y, int size, char cord[][MSIZE]) {
 	int mines =0;
 	
@@ -56,7 +90,11 @@ int countmine(int x, int y, int size, char cord[][MSIZE]) {
 	return mines;
 }
 
-//Generate the mine field 
+/**
+ * @brief Generate a minesweeper game board
+ * @param size Size of the game board
+ * @param mines Numnber of mines
+ */
 void minefieldgen(int size, int mines, char cord[][MSIZE]) {
 	for (int i=0; i<size;i++) {
 		for (int j=0; j<size; j++) {

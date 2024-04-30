@@ -10,7 +10,10 @@
 #include <string>
 #include <vector>
 using namespace std;
-// Load
+
+/**
+ * @brief Load the minesweeper game board from minefield.txt
+ */
 void loadMinefield(char cord[][MSIZE]) {
   string minefield_stream;
 
@@ -33,6 +36,14 @@ void loadMinefield(char cord[][MSIZE]) {
 
   fin.close();
 }
+
+/**
+ * @brief Display the game board
+ * @param posX x-coordinate
+ * @param posY y-coordinate
+ * @param flagMode If the player places a flag or not
+ * @param message Error message to be printed
+ */
 void display(char cord[][MSIZE], int posX, int posY, bool flagMode,
              string message) {
   move(0, 0);
@@ -69,6 +80,9 @@ void display(char cord[][MSIZE], int posX, int posY, bool flagMode,
   refresh();
 }
 
+/**
+ * @brief Initialize the game board by filling every tile with walls
+ */
 void initGameBoard(char cord[][MSIZE]) {
   for (int r = 0; r < MSIZE; r++) {
     for (int c = 0; c < MSIZE; c++) {
@@ -77,6 +91,11 @@ void initGameBoard(char cord[][MSIZE]) {
   }
 }
 
+/**
+ * @brief Check if the selected tile has already been revealed
+ * @param row Row number/y-coordinate
+ * @param col Column number/x-coordinate
+ */
 bool checkIfRevealed(char cord[][MSIZE], int row, int col) {
   if (cord[row][col] == '#' || cord[row][col] == 'F') {
     return false;
@@ -84,6 +103,12 @@ bool checkIfRevealed(char cord[][MSIZE], int row, int col) {
   return true;
 }
 
+/**
+ * @brief Recursively reveal the selected tile and tiles nearby until they reach empty tiles
+ * @param row Row number/y-coordinate
+ * @param col Column number/x-coordinate
+ * @param visited A list of coordinates that have already been visited by the player
+ */
 bool revealPos(char cord[][MSIZE], char gameBoard[][MSIZE], int row, int col,
                vector<vector<int>> &visited) {
   // getch();
@@ -116,6 +141,11 @@ bool revealPos(char cord[][MSIZE], char gameBoard[][MSIZE], int row, int col,
   return false;
 }
 
+/**
+ * @brief Check if a mine is found in the selected tile
+ * @param row Row number/y-coordinate
+ * @param col Column number/x-coordinate
+ */
 bool checkIfMineFound(char cord[][MSIZE], int row, int col) {
   if (cord[row][col] == 'X') {
     return true;
@@ -123,6 +153,11 @@ bool checkIfMineFound(char cord[][MSIZE], int row, int col) {
   return false;
 }
 
+/**
+ * @brief Place a flag on the selected tile
+ * @param row Row number/y-coordinate
+ * @param col Column number/x-coordinate
+ */
 void placeFlag(char cord[][MSIZE], int row, int col) {
   if (cord[row][col] == '#') {
     cord[row][col] = 'F';
@@ -133,6 +168,10 @@ void placeFlag(char cord[][MSIZE], int row, int col) {
     return;
   }
 }
+
+/**
+ * @brief Check if the player wins the game (i.e. no more tiles are left unrevealed or not flagged)
+ */
 bool checkIfGameWin(char cord[][MSIZE]) {
   bool gameWin = true;
   for (int r = 0; r < MSIZE; r++) {
@@ -147,7 +186,7 @@ bool checkIfGameWin(char cord[][MSIZE]) {
 }
 
 int minesweeper() {
-  minewsweepergenmain();
+  minewsweepergenmain();  // Generate the minesweeper game board
   char usrInput{};
   int posX = 0;
   int posY = 0;
