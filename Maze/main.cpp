@@ -177,7 +177,7 @@ int main() {
         refresh();
 
         if (msR == 0) {
-          std::this_thread::sleep_for(std::chrono::seconds(2));
+          std::this_thread::sleep_for(std::chrono::seconds(6));
         }
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
