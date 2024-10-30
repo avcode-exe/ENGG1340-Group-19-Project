@@ -3,6 +3,10 @@
 HKU ENGG1340/COMP2113 (2023 - 2024)
 Group 19 Project
 
+# Notice
+
+This project will be continued https://github.com/avcode-exe/ENGG1340-Group-19-Project-V2.
+
 ## Groupmates
 
 - Liu Hong Yuan Tom (3036262135)
